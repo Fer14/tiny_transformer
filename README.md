@@ -5,12 +5,12 @@
 ## The Data
 
 
-## Encoder
+## Encoder process
 
 
 ![logo](./logos/enc.png)
 
 
-## Decoder
+## Decoder process
 
 ![logo](./logos/dec.png)
