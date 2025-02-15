@@ -5,12 +5,9 @@
 ## The Data
 
 
-## Encoder process
+## Attention
 
 
-![logo](./logos/enc.png)
+![logo](./logos/attention.png)
 
 
-## Decoder process
-
-![logo](./logos/dec.png)
