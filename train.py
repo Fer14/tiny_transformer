@@ -57,6 +57,7 @@ def main():
         batch_size=512,
         shuffle=True,
     )
+
     model = TinyTransformer(
         vocab_size=len(dataset.VOCAB),
         d_model=16,
@@ -65,7 +66,6 @@ def main():
         ff_dim=128,
         max_len=dataset.max_len,
     )
-    model = train_model(model, dataloader, epochs=100)
 
     try:
         model = train_model(model, dataloader, epochs=100)

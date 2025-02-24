@@ -18,7 +18,7 @@ class BracketDataset(Dataset):
         self.VOCAB["<SOS>"] = max(self.VOCAB.values()) + 1
 
         self.ID2VOCAB = {v: k for k, v in self.VOCAB.items()}
-        self.max_len = max_len
+        self.max_len = max_len + 2
 
         self.data = []
         for _ in range(num_samples):
