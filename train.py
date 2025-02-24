@@ -28,13 +28,11 @@ def train_model(model, dataloader, epochs=5, lr=1e-4):
 
                 optimizer.zero_grad()
 
-                tgt_input = output_tokens[:, :-1]
-                tgt_output = output_tokens[:, 1:]
+                tgt_input = output_tokens[:, :-1]  # Remove <EOS> token
+                tgt_output = output_tokens[:, 1:]  # Remove <SOS> token
 
                 predictions = model(input_tokens, tgt_input)
-                print(input_tokens.shape, tgt_input.shape, predictions.shape)
-                print(predictions.view(-1, predictions.size(-1)).shape)
-                exit()
+
                 loss = loss_fn(
                     predictions.view(-1, predictions.size(-1)),
                     tgt_output.view(-1).view(-1),
@@ -56,7 +54,7 @@ def main():
     dataset = BracketDataset(num_samples=500000, max_len=10)
     dataloader = DataLoader(
         dataset,
-        batch_size=1,
+        batch_size=512,
         shuffle=True,
     )
     model = TinyTransformer(

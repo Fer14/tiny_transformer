@@ -55,22 +55,22 @@ class BracketDataset(Dataset):
         stack = []
         input_seq = []
 
-        for _ in range(random.randint(1, max_depth)):
+        for _ in range(max_depth):
             opening = random.choice(list(self.BRACKET_MAP.keys()))
             stack.append(opening)
             input_seq.append(opening)
 
         output_seq = [self.BRACKET_MAP[c] for c in reversed(stack)]
 
-        if padd:
-            output_seq = self.add_padding(output_seq)
-            input_seq = self.add_padding(input_seq)
-
         output_seq = self.add_sos(output_seq)
         output_seq = self.add_eos(output_seq)
 
         input_seq = self.add_sos(input_seq)
         input_seq = self.add_eos(input_seq)
+
+        if padd:
+            output_seq = self.add_padding(output_seq)
+            input_seq = self.add_padding(input_seq)
 
         return " ".join(input_seq), " ".join(output_seq)
 
