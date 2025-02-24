@@ -34,8 +34,8 @@ def train_model(model, dataloader, epochs=5, lr=1e-4):
                 predictions = model(input_tokens, tgt_input)
 
                 loss = loss_fn(
-                    predictions.view(-1, predictions.size(-1)),
-                    tgt_output.view(-1).view(-1),
+                    predictions.reshape(-1, predictions.size(-1)),
+                    tgt_output.reshape(-1),
                 )
                 loss.backward()
                 optimizer.step()
