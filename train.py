@@ -82,10 +82,10 @@ def main():
 
     model = TinyTransformer(
         vocab_size=len(dataset.VOCAB),
-        d_model=16,
-        num_heads=4,
-        num_layers=4,
-        ff_dim=128,
+        d_model=8,
+        num_heads=2,
+        num_layers=1,
+        ff_dim=64,
         max_len=dataset.max_len,
     )
 
@@ -94,9 +94,9 @@ def main():
     except Exception as e:
         print(e)
     finally:
-        save_model(model, "model.pth")
+        save_model(model, "model2.pth")
 
-        with open("vocab.json", "w") as f:
+        with open("vocab2.json", "w") as f:
             json.dump(dataset.VOCAB, f)
 
         print(dataset.VOCAB)

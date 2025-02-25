@@ -84,6 +84,7 @@ class MultiHeadSelfAttention(nn.Module):
         if mask is not None:
             scores = scores.masked_fill(mask == 0, float("-inf"))
         attn = self.softmax(scores)
+        self.attn = attn
         context = (attn @ v).transpose(1, 2).reshape(batch_size, q_len, d_model)
 
         return self.out_proj(context)
@@ -224,7 +225,7 @@ def save_model(model, file_path):
 
 
 def load_model(model, file_path, device):
-    state_dict = torch.load(file_path)
+    state_dict = torch.load(file_path, weights_only=True)
 
     # Load the state_dict into the model
     model.load_state_dict(state_dict)
