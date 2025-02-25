@@ -2,7 +2,7 @@
 
 ![logo](./logos/logo.png)
 
-This project demonstrates the use of a tiny Transformer model to perform sequence-to-sequence (seq2seq) tasks on synthetic data. The model is trained to map input sequences of symbolic tokens to corresponding output sequences, learning to predict the correct transformation of the input sequence into the desired output.
+This project demonstrates the use of a **tiny Transformer model** to perform sequence-to-sequence (seq2seq) tasks on synthetic data. The model is trained to map input sequences of symbolic tokens to corresponding output sequences, learning to predict the correct transformation of the input sequence into the desired output.
 
 ## The Data
 
@@ -23,9 +23,9 @@ Dataset Details:
 
 ![logo](./logos/attention.png)
 
-The model employs a self-attention mechanism to capture the relationships between different types of brackets, enabling it to generate the correct closing brackets for each opening bracket in the sequence. The attention mechanism allows the model to focus on different parts of the input sequence when generating the output sequence, making it more effective at capturing the dependencies between the brackets.
+The model employs a self-attention mechanism to capture the relationships between different types of brackets, enabling it to generate the correct closing brackets for each opening bracket in the sequence. The **attention** mechanism allows the model to focus on different parts of the input sequence when generating the output sequence, making it more effective at capturing the dependencies between the brackets.
 
-As expected, each tokens pays attention to the corresponding bracket in the input sequence.
+As expected, the model learns to pay **attention** and aligns each token in the output sequence with its corresponding bracket in the input sequence, demonstrating the effectiveness of the attention mechanism in handling such structured transformations.
 
 ![logo](./logos/attn.png)
 
