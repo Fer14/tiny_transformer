@@ -95,26 +95,16 @@ class EncoderLayer(nn.Module):
         self.self_attn = MultiHeadSelfAttention(d_model, num_heads)
         self.norm1 = nn.LayerNorm(d_model)
         self.norm2 = nn.LayerNorm(d_model)
-
-        # Feed-forward network
         self.ff = nn.Sequential(
             nn.Linear(d_model, ff_dim), nn.ReLU(), nn.Linear(ff_dim, d_model)
         )
         self.dropout = nn.Dropout(dropout)
 
-    def forward(
-        self,
-        src,
-        src_mask=None,
-    ):
-        # Self-attention + Add & Norm
+    def forward(self, src, src_mask=None):
         self_attn_out = self.self_attn(src, src, src, mask=src_mask)
         src = self.norm1(src + self.dropout(self_attn_out))
-
-        # Feed-forward + Add & Norm
         ffn_out = self.ff(src)
         src = self.norm2(src + self.dropout(ffn_out))
-
         return src
 
 
@@ -126,30 +116,22 @@ class DecoderLayer(nn.Module):
         self.norm1 = nn.LayerNorm(d_model)
         self.norm2 = nn.LayerNorm(d_model)
         self.norm3 = nn.LayerNorm(d_model)
-        # Feed-forward network
         self.ff = nn.Sequential(
             nn.Linear(d_model, ff_dim), nn.ReLU(), nn.Linear(ff_dim, d_model)
         )
         self.dropout = nn.Dropout(dropout)
 
     def forward(self, tgt, memory, tgt_mask=None, memory_mask=None):
-        # Self-attention + Add & Norm
-        mask = self.create_tgt_mask(tgt.size(1))
-        self_attn_out = self.self_attn(tgt, tgt, tgt, mask)
+        self_attn_out = self.self_attn(tgt, tgt, tgt, tgt_mask)
         tgt = self.norm1(tgt + self.dropout(self_attn_out))
 
         cross_attn_out = self.cross_attn(tgt, memory, memory, memory_mask)
         tgt = self.norm2(tgt + self.dropout(cross_attn_out))
 
-        # Feed-forward + Add & Norm
         ffn_out = self.ff(tgt)
         tgt = self.norm3(tgt + self.dropout(ffn_out))
 
         return tgt
-
-    def create_tgt_mask(self, seq_len):
-        mask = torch.triu(torch.ones(seq_len, seq_len), diagonal=1)
-        return mask == 0
 
 
 class TinyTransformer(nn.Module):
@@ -185,7 +167,12 @@ class TinyTransformer(nn.Module):
 
         self.fc_out = nn.Linear(d_model, vocab_size)
 
-    def forward(self, src, tgt, src_mask=None, tgt_mask=None):
+    def generate_square_subsequent_mask(self, sz):
+        return torch.tril(torch.ones(sz, sz, dtype=torch.bool))
+
+    def forward(self, src, tgt):
+        src_mask = None
+        tgt_mask = self.generate_square_subsequent_mask(tgt.size(1)).to(tgt.device)
         # print("X", src.shape)
         # Embedding + Positional Encoding
         src = self.embedding(src)
@@ -199,42 +186,34 @@ class TinyTransformer(nn.Module):
         tgt = self.pos_encoder(tgt)
         # print("Y-input", tgt.shape)
 
-        # Pass through encoder layers (only self-attention)
         for layer in self.encoder:
             src = layer(src, src_mask)
 
-        # Pass through decoder layers (only self-attention)
         for layer in self.decoder:
-            tgt_mask = layer.create_tgt_mask(tgt.size(1))
             tgt = layer(tgt, src, tgt_mask, src_mask)
 
         return self.fc_out(tgt)
 
-    def generate(self, input, eos_token=11, max_len=20):
-        # Start with the input sequence
-        output = input.clone().unsqueeze(0)  # Add batch dimension
+    def generate(self, input, eos_token=11, sos_token=12, max_len=20):
+        self.eval()  # Set model to evaluation mode
+
+        # Start with <SOS> token
+        output = torch.tensor([[sos_token]], device=input.device)  # Shape (1, 1)
+
         for _ in range(max_len):
-            # Create a target mask to prevent attending to future tokens
-            tgt_mask = self.decoder[0].create_tgt_mask(output.size(1)).to(output.device)
+            out = self(input.unsqueeze(0), output)
 
-            # Forward pass through the transformer
-            out = self(output, output, src_mask=None, tgt_mask=tgt_mask)
+            # Get the predicted token from the last position
+            next_token = out[:, -1, :].argmax(dim=-1, keepdim=True)
 
-            # Get the predicted token (highest probability) from the last token in the sequence
-            next_token = out[:, -1, :].argmax(
-                dim=-1
-            )  # Get the token with the highest probability
-            next_token = next_token.unsqueeze(1)
-
-            # Append the predicted token to the sequence
+            # Append predicted token
             output = torch.cat([output, next_token], dim=1)
 
-            # If eos_token is predicted, break the loop
+            # Stop if EOS token is generated
             if next_token.item() == eos_token:
                 break
 
-        # Remove the batch dimension before returning
-        return output.squeeze(0)
+        return output.squeeze(0)  # Remove batch dimension
 
 
 def save_model(model, file_path):

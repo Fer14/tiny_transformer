@@ -36,6 +36,10 @@ class BracketDataset(Dataset):
             output_tokens, dtype=torch.long
         )
 
+    def update_vocab(self, vocab):
+        self.VOCAB = vocab
+        self.ID2VOCAB = {v: k for k, v in self.VOCAB.items()}
+
     def tokenize(self, expression):
         """Tokenize a string expression into a list of token IDs."""
         return [self.VOCAB[ch] for ch in expression.split() if ch in self.VOCAB]
