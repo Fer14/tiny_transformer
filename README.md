@@ -18,6 +18,17 @@ Dataset Details:
 
 - ``Vocabulary``: Includes opening and closing brackets, as well as special tokens like <SOS>, <EOS> to indicate the Start and End Of the Sentence .
 
+Examples:
+
+```python
+- Input: <SOS> { ( < [ ( { < ¿ { ( <EOS>   Output: <SOS> ) } ? > } ) ] > ) } <EOS>
+- Input: <SOS> ¿ [ [ ( [ { [ [ ¿ < <EOS>   Output: <SOS> > ? ] ] } ] ) ] ] ? <EOS> 
+- Input: <SOS> [ [ < < [ { < { [ ( <EOS>   Output: <SOS> ) ] } > } ] > > ] ] <EOS>
+- Input: <SOS> [ [ [ ( { { [ < { < <EOS>   Output: <SOS> > } > ] } } ) ] ] ] <EOS>
+- Input: <SOS> < { < ¿ < { < < { ¿ <EOS>   Output: <SOS> ? } > > } > ? > } > <EOS>
+``````
+
+
 ## Attention Mehanism
 
 
